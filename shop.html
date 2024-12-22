@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jayarathne Stores</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            padding: 10px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            flex: 1;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+            font-size: 12px;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        table th {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        .bottom-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 18px;
+            }
+
+            button {
+                padding: 8px;
+                font-size: 12px;
+            }
+
+            .buttons, .bottom-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            table th, table td {
+                padding: 5px;
+            }
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            table, table * {
+                visibility: visible;
+            }
+            table {
+                position: absolute;
+                top: 0;
+                left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Jayarathne Stores</h1>
+
+        <div class="form-group">
+            <label for="itemNo">Item No</label>
+            <input type="text" id="itemNo" placeholder="Enter item number">
+        </div>
+
+        <div class="form-group">
+            <label for="itemName">Item Name</label>
+            <input type="text" id="itemName" placeholder="Enter item name">
+        </div>
+
+        <div class="form-group">
+            <label for="quantity">Quantity</label>
+            <input type="number" id="quantity" placeholder="Enter quantity">
+        </div>
+
+        <div class="form-group">
+            <label for="price">Price</label>
+            <input type="number" id="price" placeholder="Enter price">
+        </div>
+
+        <div class="buttons">
+            <button onclick="addToTable()">Add</button>
+            <button onclick="deleteSelected()">Delete</button>
+            <button onclick="ClearForm()">Clear</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Item No</th>
+                    <th>Item Name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody id="itemTable">
+                <!-- Dynamic rows will be added here -->
+            </tbody>
+        </table>
+
+        <div class="bottom-buttons">
+            <button onclick="printBill()">Print</button>
+            <button onclick="saveBill()">Save</button>
+        </div>
+    </div>
+
+    <script>
+        function addToTable() {
+            const itemNo = document.getElementById('itemNo').value;
+            const itemName = document.getElementById('itemName').value;
+            const quantity = document.getElementById('quantity').value;
+            const price = document.getElementById('price').value;
+
+            if (itemNo && itemName && quantity && price) {
+                const table = document.getElementById('itemTable');
+                const row = table.insertRow();
+
+                const total = quantity * price;
+
+                row.innerHTML = `
+                <td><input type='checkbox' /></td>
+                    <td>${itemNo}</td>
+                    <td>${itemName}</td>
+                    <td>${quantity}</td>
+                    <td>${price}</td>
+                    <td>${total}</td>
+                `;
+
+                clearForm();
+            } else {
+                alert('Please fill all fields!');
+            }
+        }
+
+        function deleteSelected() {
+            const table = document.getElementById('itemTable');
+            const checkboxes = table.querySelectorAll('input[type="checkbox"]');
+
+            checkboxes.forEach((checkbox, index) => {
+                if (checkbox.checked) {
+                    table.deleteRow(index);
+                }
+            });
+        }
+
+        function printBill() {
+    // Create a new table element
+    const table = document.querySelector('table');
+    const rows = table.rows;
+    let printContents = '<table border="1" style="width: 100%; border-collapse: collapse;">';
+
+    // Loop through table rows and add only required columns
+    for (let i = 0; i < rows.length; i++) {
+        const cells = rows[i].cells;
+        printContents += '<tr>';
+
+        // Include only the desired columns (Item No, Item Name, Quantity, Price)
+        for (let j = 0; j < cells.length; j++) {
+            if ( j === 1 || j === 2 || j === 3 || j === 4 || j === 5) { // Adjust indexes for desired columns
+                printContents += `<td>${cells[j].innerHTML}</td>`;
+            }
+        }
+
+        printContents += '</tr>';
+    }
+    printContents += '</table>';
+
+    // Save the current page content
+    const originalContents = document.body.innerHTML;
+
+    // Set the body content to the print table and trigger print
+    document.body.innerHTML = printContents;
+    window.print();
+
+    // Restore the original page content
+    document.body.innerHTML = originalContents;
+
+    location.reload(); // Reload the page to restore functionality
+}
+
+
+        function saveBill() {
+            alert('Bill saved successfully!');
+        }
+    </script>
+</body>
+</html>
